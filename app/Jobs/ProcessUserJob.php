@@ -59,5 +59,11 @@ class ProcessUserJob implements ShouldQueue
         ];
     
         Cache::put("user_result_{$this->user->id}", $result, now()->addMinutes(2));
+
+        Cache::increment('jobs_count');
+
+        if ($alertCount > 0) {
+            $total = Cache::increment('total_alerts', $alertCount);
+        }
     }
 }
