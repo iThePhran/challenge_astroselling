@@ -58,7 +58,7 @@ class ProcessUserJob implements ShouldQueue
             'date' => now()->toDateTimeString(),
         ];
     
-        Cache::put("user_result_{$this->user->id}", $result, now()->addMinutes(2));
+        Cache::put("user_result_{$this->user->id}", $result, now()->addMinutes(30));
 
         Cache::increment('jobs_count');
 

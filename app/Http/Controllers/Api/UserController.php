@@ -11,16 +11,44 @@ use Illuminate\Support\Facades\Cache;
 class UserController extends Controller
 {
      /**
-     * Devuelve usuarios paginados en formato de JSON.
+     * Devuelve usuarios paginados en formato de JSON a demanda.
      */
     public function index(Request $request)
     {
-        $perPage = $request->get('per_page', 10);
-        $users = User::paginate($perPage);
-
+        $users = $this->getPaginatedUsers($request);
         return response()->json($users);
     }
 
+    /**
+     * retorna usuarios paginados en formato de JSON.
+     */
+    private function getPaginatedUsers(Request $request)
+    {
+        $perPage = $request->get('per_page', 10);
+        $page = $request->get('page', 1);
+        
+
+        return User::paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Devuelve la vista de usuarios paginados.
+     */
+    public function userList(Request $request)
+    {
+        $users = $this->getPaginatedUsers($request);
+
+        $users->getCollection()->transform(function ($user) {
+            $cacheKey = "user_result_{$user->id}";
+            $data = Cache::get($cacheKey);
+
+            $user->alert_count = $data['alerts_count'] ?? 0;
+            $user->nivel_alerta = $data['alert_level'] ?? 'sin datos';
+            return $user;
+        });
+
+        return view('users.index', compact('users'));
+    }
 
 
     /**

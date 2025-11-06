@@ -23,6 +23,7 @@ Route::get('/', function () {
 Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/users-list', [App\Http\Controllers\Api\UserController::class, 'userList'])->name('users-list');
 
 Route::middleware('auth')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
